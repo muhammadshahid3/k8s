@@ -18,14 +18,15 @@ spec:
       # DB migrate hone tak app start na ho
       initContainers:
         - name: migrate
-          image: shahiddevops1/laravel-shop-app:latest   # <-- change #1
-          command: ["php", "artisan", "migrate", "--force"]
+          image: shahiddevops1/laravel-shop-app:latest
+          command: ["sh", "-c", "rm -f .env && php artisan migrate --force"]
           envFrom:
             - secretRef:
                 name: laravel-shop-secret
       containers:
         - name: laravel-shop
-          image: shahiddevops1/laravel-shop-app:latest   # <-- change #2
+          image: shahiddevops1/laravel-shop-app:latest
+          command: ["sh", "-c", "rm -f .env && php artisan config:clear && php artisan serve --host=0.0.0.0 --port=8000"]
           ports:
             - containerPort: 8000
           envFrom:
