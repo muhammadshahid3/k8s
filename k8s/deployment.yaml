@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: laravel-shop
+  namespace: laravel-shop
+  labels:
+    app: laravel-shop
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: laravel-shop
+  template:
+    metadata:
+      labels:
+        app: laravel-shop
+    spec:
+      # DB migrate hone tak app start na ho
+      initContainers:
+        - name: migrate
+          image: shahiddevops1/laravel-shop-app:latest   # <-- change #1
+          command: ["php", "artisan", "migrate", "--force"]
+          envFrom:
+            - secretRef:
+                name: laravel-shop-secret
+      containers:
+        - name: laravel-shop
+          image: shahiddevops1/laravel-shop-app:latest   # <-- change #2
+          ports:
+            - containerPort: 8000
+          envFrom:
+            - secretRef:
+                name: laravel-shop-secret
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8000
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"

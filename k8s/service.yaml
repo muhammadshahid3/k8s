@@ -1,0 +1,17 @@
+# Ingress controller terraform se hata diya gaya hai, is liye seedha
+# LoadBalancer type Service use kar rahe hain — AWS apne aap ek Classic/NLB
+# bana dega jis se app tak public access mil jayega. Testing ke baad agar
+# ingress wapis chahiye ho to bata dena.
+apiVersion: v1
+kind: Service
+metadata:
+  name: laravel-shop
+  namespace: laravel-shop
+spec:
+  type: LoadBalancer
+  selector:
+    app: laravel-shop
+  ports:
+    - port: 80
+      targetPort: 8000
+      protocol: TCP
